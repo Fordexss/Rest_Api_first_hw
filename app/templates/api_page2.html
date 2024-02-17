@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Сторінка 2</title>
+</head>
+<body>
+
+    <h1>Шось там 2</h1>
+
+    <div id="api-data2"></div>
+
+    <script>
+        fetch('/api/data2')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('api-data2').innerText = data.message;
+            });
+    </script>
+
+</body>
+</html>

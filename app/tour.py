@@ -1,9 +1,33 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify
+from flask import render_template, request, redirect, url_for
+from flask_restful import Resource
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tours.db'
 db = SQLAlchemy(app)
+
+
+class TourApi(Resource):
+    def get(self):
+        tours = Tour.query.all()
+        tours_data = [{
+            'title': tour.title,
+            'description': tour.description
+        } for tour in tours]
+        return jsonify(tours_data)
+
+
+class OrderApi(Resource):
+    def get(self):
+        orders = Order.query.all()
+        booked_tours_data = [{
+            'tour_title': order.tour_title,
+            'surname': order.surname,
+            'name': order.name,
+            'date': order.date
+        } for order in orders]
+        return jsonify(booked_tours_data)
 
 
 class Tour(db.Model):
@@ -26,6 +50,46 @@ class Order(db.Model):
 
 with app.app_context():
     db.create_all()
+
+
+@app.route('/api/booked_tours', methods=['GET'])
+def api_booked_tours():
+    orders = Order.query.all()
+    booked_tours_data = []
+
+    for order in orders:
+        booked_tours_data.append({
+            'tour_title': order.tour_title,
+            'surname': order.surname,
+            'name': order.name,
+            'date': order.date
+        })
+
+    return jsonify(booked_tours_data)
+
+
+@app.route('/api/tours_summary', methods=['GET'])
+def api_tours_summary():
+    tours = Tour.query.all()
+    tours_summary_data = [{
+        'title': tour.title,
+        'description': tour.description
+    } for tour in tours]
+    return jsonify(tours_summary_data)
+
+
+# тест
+@app.route('/api/data1', methods=['GET'])
+def api_page1():
+    data = {"message": "Це дані для першої сторінки API."}
+    return jsonify(data)
+
+
+# тест
+@app.route('/api/data2', methods=['GET'])
+def api_page2():
+    data = {"message": "Це дані для другої сторінки API."}
+    return jsonify(data)
 
 
 @app.route('/')
